@@ -22,6 +22,7 @@ interface QuoteRequest {
   vehicleModel?: string | null
   vehicleYear?: number | null
   vehicleMileage?: number | null
+  rejectionReason?: string | null
   createdAt: string
   attachments: Attachment[]
 }
@@ -114,6 +115,14 @@ export default function ClientRequestsPage() {
                       )}
 
                       <p className="text-sm text-gray-600 line-clamp-2">{req.description}</p>
+
+                      {/* Rejection reason */}
+                      {req.status === 'REJECTED' && req.rejectionReason && (
+                        <div className="flex items-start gap-1.5 mt-2 text-xs text-red-700 bg-red-50 border border-red-100 px-2.5 py-2 rounded-lg">
+                          <XCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                          <span><strong>Motif de refus :</strong> {req.rejectionReason}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 

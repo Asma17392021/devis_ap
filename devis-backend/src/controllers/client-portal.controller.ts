@@ -173,3 +173,30 @@ export async function deleteRequestAttachment(req: Request, res: Response) {
 
   return noContent(res)
 }
+
+// ─── GET /api/client-portal/notifications ────────────────────────────────────
+export async function getMyNotifications(req: Request, res: Response) {
+  const accountId = req.clientAccount!.accountId
+
+  const notifications = await prisma.clientNotification.findMany({
+    where: { accountId },
+    orderBy: { createdAt: 'desc' },
+    take: 50,
+  })
+
+  const unreadCount = notifications.filter((n) => !n.readAt).length
+
+  return success(res, { notifications, unreadCount })
+}
+
+// ─── PATCH /api/client-portal/notifications/read-all ─────────────────────────
+export async function markAllNotificationsRead(req: Request, res: Response) {
+  const accountId = req.clientAccount!.accountId
+
+  await prisma.clientNotification.updateMany({
+    where: { accountId, readAt: null },
+    data: { readAt: new Date() },
+  })
+
+  return success(res, { message: 'Toutes les notifications marquées comme lues' })
+}

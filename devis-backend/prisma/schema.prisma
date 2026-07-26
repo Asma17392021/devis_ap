@@ -185,6 +185,8 @@ model ClientAccount {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  notifications ClientNotification[]
+
   @@map("client_accounts")
 }
 
@@ -200,6 +202,8 @@ model QuoteRequest {
   vehicleYear    Int?
   vehicleVin     String?
   vehicleMileage Int?
+
+  rejectionReason String?
 
   clientId    String
   client      Client             @relation(fields: [clientId], references: [id])
@@ -223,6 +227,18 @@ model QuoteRequestAttachment {
   request   QuoteRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
   @@map("quote_request_attachments")
+}
+
+model ClientNotification {
+  id        String    @id @default(uuid())
+  type      String    // REQUEST_REJECTED, REQUEST_UPDATED, etc.
+  message   String
+  readAt    DateTime?
+  accountId String
+  account   ClientAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@map("client_notifications")
 }
 
 model CompanySettings {

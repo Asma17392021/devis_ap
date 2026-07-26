@@ -7,6 +7,8 @@ import {
   createRequest,
   uploadRequestAttachment,
   deleteRequestAttachment,
+  getMyNotifications,
+  markAllNotificationsRead,
 } from '../controllers/client-portal.controller'
 
 const router = Router()
@@ -20,5 +22,7 @@ router.get('/quote-requests', getMyRequests)
 router.post('/quote-requests', createRequest)
 router.post('/quote-requests/:id/attachments', upload.single('file'), uploadRequestAttachment)
 router.delete('/quote-requests/:id/attachments/:attachmentId', deleteRequestAttachment)
+router.get('/notifications', getMyNotifications)
+router.patch('/notifications/read-all', markAllNotificationsRead)
 
 export { router as clientPortalRouter }

@@ -194,6 +194,91 @@ export async function sendSignatureConfirmation(params: SendSignatureConfirmatio
   }
 }
 
+/**
+ * Notify client that their quote request was rejected (with optional reason).
+ */
+export async function sendRequestRejection(params: {
+  clientEmail: string
+  clientName: string
+  requestTitle: string
+  rejectionReason?: string
+  companyName: string
+  portalUrl: string
+}): Promise<void> {
+  const { clientEmail, clientName, requestTitle, rejectionReason, companyName, portalUrl } = params
+
+  const content = `
+    <p>Bonjour ${clientName},</p>
+    <p>Nous avons examiné votre demande de devis :</p>
+    <p><strong>${requestTitle}</strong></p>
+    <p><span class="badge-refused">❌ Demande refusée</span></p>
+    ${rejectionReason ? `
+    <div style="background:#fff7f7;border-left:4px solid #dc2626;padding:12px 16px;margin:16px 0;border-radius:4px;">
+      <p style="margin:0;color:#7f1d1d;font-size:14px;"><strong>Motif :</strong> ${rejectionReason}</p>
+    </div>` : ''}
+    <p>N'hésitez pas à nous contacter ou à soumettre une nouvelle demande depuis votre espace client.</p>
+    <a href="${portalUrl}" class="cta">Accéder à mon espace</a>
+    <p>Cordialement,<br/><strong>${companyName}</strong></p>
+  `
+
+  try {
+    const client = getResend()
+    await client.emails.send({
+      from: `${companyName} <noreply@${getDomain()}>`,
+      to: clientEmail,
+      subject: `Votre demande de devis — ${requestTitle}`,
+      html: wrapEmail(content, companyName),
+    })
+    console.log(`📧 Email refus demande envoyé à ${clientEmail}`)
+  } catch (err) {
+    console.error(`⚠️ Email refus demande échoué pour ${clientEmail}:`, err)
+  }
+}
+
+/**
+ * Notify client that their quote request status was updated.
+ */
+export async function sendRequestStatusUpdate(params: {
+  clientEmail: string
+  clientName: string
+  requestTitle: string
+  newStatus: string
+  companyName: string
+  portalUrl: string
+}): Promise<void> {
+  const { clientEmail, clientName, requestTitle, newStatus, companyName, portalUrl } = params
+
+  const statusLabels: Record<string, string> = {
+    IN_PROGRESS: '🔄 En cours de traitement',
+    COMPLETED: '✅ Traité — un devis va vous être envoyé',
+  }
+
+  const label = statusLabels[newStatus]
+  if (!label) return // Don't send for other statuses
+
+  const content = `
+    <p>Bonjour ${clientName},</p>
+    <p>Le statut de votre demande de devis a été mis à jour :</p>
+    <p><strong>${requestTitle}</strong></p>
+    <p><span style="background:#dbeafe;color:#1d4ed8;padding:4px 12px;border-radius:999px;font-weight:700;font-size:13px;">${label}</span></p>
+    <a href="${portalUrl}" class="cta">Voir mes demandes</a>
+    <p>Cordialement,<br/><strong>${companyName}</strong></p>
+  `
+
+  try {
+    const client = getResend()
+    await client.emails.send({
+      from: `${companyName} <noreply@${getDomain()}>`,
+      to: clientEmail,
+      subject: `Mise à jour de votre demande — ${requestTitle}`,
+      html: wrapEmail(content, companyName),
+    })
+    console.log(`📧 Email mise à jour demande envoyé à ${clientEmail}`)
+  } catch (err) {
+    console.error(`⚠️ Email mise à jour demande échoué:`, err)
+  }
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getDomain(): string {
