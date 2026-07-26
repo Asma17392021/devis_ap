@@ -1,0 +1,23 @@
+# Root
+node_modules/
+.DS_Store
+
+# Env files (never commit secrets)
+.env
+.env.local
+*.env.local
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+
+# Large files
+*.mp4
+*.mov
+*.avi
+
+# Build artifacts
+.next/
+dist/
+build/

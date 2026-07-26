@@ -1,0 +1,251 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  MANAGER
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REFUSED
+  EXPIRED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+enum NotificationType {
+  QUOTE_SENT
+  QUOTE_ACCEPTED
+  QUOTE_REFUSED
+  QUOTE_EXPIRING
+  QUOTE_EXPIRED
+  QUOTE_REQUEST_RECEIVED
+}
+
+enum QuoteRequestStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(MANAGER)
+  firstName    String
+  lastName     String
+  phone        String?
+  fcmToken     String?  // Firebase Cloud Messaging token (mobile)
+  preferredLang String  @default("fr")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  quotes        Quote[]        @relation("CreatedBy")
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Client {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  address     String?
+  city        String?
+  postalCode  String?
+  country     String   @default("FR")
+  siret       String?
+  vatNumber   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  quotes        Quote[]
+  account       ClientAccount?
+  quoteRequests QuoteRequest[]
+
+  @@map("clients")
+}
+
+model Quote {
+  id                 String      @id @default(uuid())
+  number             String      @unique // QT-2026-001
+  status             QuoteStatus @default(DRAFT)
+  title              String
+  notes              String?     // Internal notes, not visible to client
+  termsAndConditions String?
+
+  issueDate  DateTime @db.Date
+  expiryDate DateTime @db.Date
+
+  // Discount (global, applied after line subtotals)
+  discount     Decimal?     @db.Decimal(10, 2)
+  discountType DiscountType?
+
+  // Storage
+  pdfUrl String?
+
+  // Client portal & signature
+  signatureToken   String?   @unique @default(uuid())
+  signedAt         DateTime?
+  signedIp         String?
+  signedUserAgent  String?
+
+  // Relations
+  clientId    String
+  client      Client @relation(fields: [clientId], references: [id])
+  createdById String
+  createdBy   User   @relation("CreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lines         QuoteLine[]
+  attachments   Attachment[]
+  notifications Notification[]
+
+  @@map("quotes")
+}
+
+model QuoteLine {
+  id          String  @id @default(uuid())
+  description String
+  quantity    Decimal @db.Decimal(10, 3)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  vatRate     Decimal @db.Decimal(5, 2) // 0, 5.5, 10, 20
+
+  // Per-line discount (optional)
+  discount     Decimal?     @db.Decimal(10, 2)
+  discountType DiscountType?
+
+  position Int // Display order
+
+  quoteId String
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@map("quote_lines")
+}
+
+model Attachment {
+  id         String   @id @default(uuid())
+  fileName   String
+  fileUrl    String
+  fileSize   Int      // bytes
+  mimeType   String
+  uploadedAt DateTime @default(now())
+
+  quoteId String
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
+
+model Notification {
+  id      String           @id @default(uuid())
+  type    NotificationType
+  message String
+  readAt  DateTime?
+
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quoteId String
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model ClientAccount {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  clientId     String   @unique
+  client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("client_accounts")
+}
+
+model QuoteRequest {
+  id          String             @id @default(uuid())
+  title       String
+  description String
+  status      QuoteRequestStatus @default(PENDING)
+
+  // Vehicle info
+  vehicleMake    String?
+  vehicleModel   String?
+  vehicleYear    Int?
+  vehicleVin     String?
+  vehicleMileage Int?
+
+  clientId    String
+  client      Client             @relation(fields: [clientId], references: [id])
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  attachments QuoteRequestAttachment[]
+
+  @@map("quote_requests")
+}
+
+model QuoteRequestAttachment {
+  id         String   @id @default(uuid())
+  fileName   String
+  fileUrl    String
+  fileSize   Int
+  mimeType   String
+  uploadedAt DateTime @default(now())
+
+  requestId String
+  request   QuoteRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@map("quote_request_attachments")
+}
+
+model CompanySettings {
+  id                 String  @id @default("singleton")
+  name               String  @default("Mon Entreprise")
+  email              String  @default("contact@monentreprise.com")
+  phone              String?
+  address            String?
+  city               String?
+  postalCode         String?
+  country            String  @default("FR")
+  siret              String?
+  vatNumber          String?
+  logoUrl            String?
+  termsAndConditions String?  // Default terms pre-filled on new quotes
+
+  // Quote defaults
+  defaultQuoteValidityDays Int     @default(30)
+
+  // Notification preferences
+  notifyOnQuoteAccepted Boolean @default(true)
+  notifyOnQuoteRefused  Boolean @default(true)
+  notifyOnQuoteExpiring Boolean @default(true)
+
+  @@map("company_settings")
+}
