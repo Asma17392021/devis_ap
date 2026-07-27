@@ -26,6 +26,7 @@ export interface Quote {
   discount?: number | null
   discountType?: 'PERCENTAGE' | 'FIXED' | null
   pdfUrl?: string | null
+  signatureToken?: string | null
   signedAt?: string | null
   client: { id: string; name: string; email: string }
   createdBy: { id: string; firstName: string; lastName: string }

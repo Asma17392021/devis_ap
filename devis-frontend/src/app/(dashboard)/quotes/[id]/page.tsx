@@ -21,9 +21,9 @@ import { api } from '@/lib/api'
 
 // ─── Portal link copy button ──────────────────────────────────────────────────
 
-function PortalLinkSection({ quoteId }: { quoteId: string }) {
+function PortalLinkSection({ token }: { token: string }) {
   const [copied, setCopied] = useState(false)
-  const portalUrl = `${window.location.origin}/client/${quoteId}`
+  const portalUrl = `${window.location.origin}/client/${token}`
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(portalUrl)
@@ -390,12 +390,12 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
       </div>
 
       {/* Portal link — shown when SENT/ACCEPTED/REFUSED */}
-      {(isSent || quote.status === 'ACCEPTED' || quote.status === 'REFUSED') && (
+      {(isSent || quote.status === 'ACCEPTED' || quote.status === 'REFUSED') && quote.signatureToken && (
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
             Lien portail client
           </p>
-          <PortalLinkSection quoteId={quote.id} />
+          <PortalLinkSection token={quote.signatureToken} />
         </div>
       )}
 

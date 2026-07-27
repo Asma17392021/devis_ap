@@ -208,7 +208,6 @@ export function buildQuoteHtml(data: QuoteTemplateData): string {
       <div class="signature-icon">✅</div>
       <div>
         <strong>${t.signedNote} ${formatDate(data.signedAt, data.lang)}</strong>
-        ${data.signedIp ? `<br><span class="signature-ip">${t.fromIp} ${data.signedIp}</span>` : ''}
       </div>
     </div>` : ''
 
