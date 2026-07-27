@@ -19,7 +19,7 @@ export async function getMyQuotes(req: Request, res: Response) {
   const clientId = req.clientAccount!.clientId
 
   const quotes = await prisma.quote.findMany({
-    where: { clientId },
+    where: { clientId, status: { not: 'DRAFT' } },
     select: {
       id: true,
       number: true,
