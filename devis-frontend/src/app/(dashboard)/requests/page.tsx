@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import {
   ClipboardList, Car, Paperclip, FileText, Search,
   Clock, Loader2, CheckCircle, XCircle, ChevronDown,
-  ExternalLink, AlertTriangle, X,
+  ExternalLink, AlertTriangle, X, UserRound,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -24,6 +24,7 @@ interface QuoteRequest {
   rejectionReason?: string | null; createdAt: string
   client: { id: string; name: string; email: string; phone?: string | null }
   attachments: Attachment[]
+  handledBy?: { id: string; firstName: string; lastName: string } | null
 }
 
 // ─── Config ───────────────────────────────────────────────────────────────────
@@ -362,6 +363,12 @@ export default function AdminRequestsPage() {
                         </span>
                       )}
                       <span className="text-xs text-gray-400">{formatDate(req.createdAt)}</span>
+                      {req.handledBy && (
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                          <UserRound className="w-3 h-3" />
+                          {req.handledBy.firstName} {req.handledBy.lastName}
+                        </span>
+                      )}
                       {req.attachments.length > 0 && (
                         <span className="inline-flex items-center gap-1 text-xs text-gray-500">
                           <Paperclip className="w-3 h-3" />
@@ -420,6 +427,12 @@ export default function AdminRequestsPage() {
                         <div>
                           <p className="text-xs text-gray-400 font-medium mb-0.5">Kilométrage</p>
                           <p className="text-gray-800 text-sm">{req.vehicleMileage.toLocaleString('fr-FR')} km</p>
+                        </div>
+                      )}
+                      {req.handledBy && (
+                        <div>
+                          <p className="text-xs text-gray-400 font-medium mb-0.5">Traité par</p>
+                          <p className="text-gray-800 text-sm">{req.handledBy.firstName} {req.handledBy.lastName}</p>
                         </div>
                       )}
                     </div>

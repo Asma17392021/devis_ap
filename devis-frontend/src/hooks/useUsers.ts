@@ -47,6 +47,29 @@ export function useDeleteUser() {
   })
 }
 
+export interface ManagerStats {
+  id: string
+  firstName: string
+  lastName: string
+  role: 'ADMIN' | 'MANAGER'
+  requestsHandled: number
+  requestsCompleted: number
+  requestsRejected: number
+  quotesCreated: number
+  quotesAccepted: number
+  quotesRefused: number
+}
+
+export function useManagerStats() {
+  return useQuery<ManagerStats[]>({
+    queryKey: ['managers-stats'],
+    queryFn: async () => {
+      const res = await api.get<{ data: ManagerStats[] }>('/dashboard/managers-stats')
+      return res.data.data
+    },
+  })
+}
+
 export function useSettings() {
   return useQuery({
     queryKey: ['settings'],

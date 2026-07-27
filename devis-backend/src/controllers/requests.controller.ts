@@ -34,6 +34,7 @@ export async function listRequests(req: Request, res: Response) {
       include: {
         client: { select: { id: true, name: true, email: true, phone: true } },
         attachments: true,
+        handledBy: { select: { id: true, firstName: true, lastName: true } },
       },
       orderBy: { createdAt: 'desc' },
       skip: (pageNum - 1) * limitNum,
@@ -80,10 +81,12 @@ export async function updateRequestStatus(req: Request, res: Response) {
     data: {
       status,
       rejectionReason: status === 'REJECTED' ? rejectionReason : null,
+      handledById: req.user!.userId,
     },
     include: {
       client: { select: { id: true, name: true, email: true, account: { select: { id: true } } } },
       attachments: true,
+      handledBy: { select: { id: true, firstName: true, lastName: true } },
     },
   }).catch(() => null)
 
@@ -94,6 +97,9 @@ export async function updateRequestStatus(req: Request, res: Response) {
   const accountId = request.client.account?.id
   const portalUrl = `${env.FRONTEND_URL}/client/requests`
   const companyName = 'Devis Pro'
+  const handledByName = request.handledBy
+    ? `${request.handledBy.firstName} ${request.handledBy.lastName}`
+    : undefined
 
   // ── Create client in-app notification ────────────────────────────────────
   if (accountId) {
@@ -125,6 +131,7 @@ export async function updateRequestStatus(req: Request, res: Response) {
       clientName,
       requestTitle: request.title,
       rejectionReason,
+      handledByName,
       companyName,
       portalUrl,
     })
@@ -134,6 +141,7 @@ export async function updateRequestStatus(req: Request, res: Response) {
       clientName,
       requestTitle: request.title,
       newStatus: status,
+      handledByName,
       companyName,
       portalUrl,
     })

@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { authenticate } from '../middleware/auth.middleware'
-import { getStats } from '../controllers/dashboard.controller'
+import { requireRole } from '../middleware/role.middleware'
+import { getStats, getManagerStats } from '../controllers/dashboard.controller'
 
 const router = Router()
 
@@ -37,5 +38,6 @@ router.use(authenticate)
  *                   type: array
  */
 router.get('/stats', getStats)
+router.get('/managers-stats', requireRole('ADMIN'), getManagerStats)
 
 export { router as dashboardRouter }

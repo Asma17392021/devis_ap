@@ -71,7 +71,10 @@ export async function getMyRequests(req: Request, res: Response) {
 
   const requests = await prisma.quoteRequest.findMany({
     where: { clientId },
-    include: { attachments: true },
+    include: {
+      attachments: true,
+      handledBy: { select: { firstName: true, lastName: true } },
+    },
     orderBy: { createdAt: 'desc' },
   })
 

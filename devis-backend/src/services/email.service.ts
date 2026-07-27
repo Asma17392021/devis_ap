@@ -202,10 +202,11 @@ export async function sendRequestRejection(params: {
   clientName: string
   requestTitle: string
   rejectionReason?: string
+  handledByName?: string
   companyName: string
   portalUrl: string
 }): Promise<void> {
-  const { clientEmail, clientName, requestTitle, rejectionReason, companyName, portalUrl } = params
+  const { clientEmail, clientName, requestTitle, rejectionReason, handledByName, companyName, portalUrl } = params
 
   const content = `
     <p>Bonjour ${clientName},</p>
@@ -216,6 +217,7 @@ export async function sendRequestRejection(params: {
     <div style="background:#fff7f7;border-left:4px solid #dc2626;padding:12px 16px;margin:16px 0;border-radius:4px;">
       <p style="margin:0;color:#7f1d1d;font-size:14px;"><strong>Motif :</strong> ${rejectionReason}</p>
     </div>` : ''}
+    ${handledByName ? `<p style="color:#6b7280;font-size:13px;">Traité par ${handledByName}</p>` : ''}
     <p>N'hésitez pas à nous contacter ou à soumettre une nouvelle demande depuis votre espace client.</p>
     <a href="${portalUrl}" class="cta">Accéder à mon espace</a>
     <p>Cordialement,<br/><strong>${companyName}</strong></p>
@@ -243,10 +245,11 @@ export async function sendRequestStatusUpdate(params: {
   clientName: string
   requestTitle: string
   newStatus: string
+  handledByName?: string
   companyName: string
   portalUrl: string
 }): Promise<void> {
-  const { clientEmail, clientName, requestTitle, newStatus, companyName, portalUrl } = params
+  const { clientEmail, clientName, requestTitle, newStatus, handledByName, companyName, portalUrl } = params
 
   const statusLabels: Record<string, string> = {
     IN_PROGRESS: '🔄 En cours de traitement',
@@ -261,6 +264,7 @@ export async function sendRequestStatusUpdate(params: {
     <p>Le statut de votre demande de devis a été mis à jour :</p>
     <p><strong>${requestTitle}</strong></p>
     <p><span style="background:#dbeafe;color:#1d4ed8;padding:4px 12px;border-radius:999px;font-weight:700;font-size:13px;">${label}</span></p>
+    ${handledByName ? `<p style="color:#6b7280;font-size:13px;">Traité par ${handledByName}</p>` : ''}
     <a href="${portalUrl}" class="cta">Voir mes demandes</a>
     <p>Cordialement,<br/><strong>${companyName}</strong></p>
   `

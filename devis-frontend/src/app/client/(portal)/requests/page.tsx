@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { clientApi } from '@/lib/client-api'
-import { ClipboardList, Clock, CheckCircle, XCircle, Loader2, Plus, ArrowRight, Car, Paperclip, FileText } from 'lucide-react'
+import { ClipboardList, Clock, CheckCircle, XCircle, Loader2, Plus, ArrowRight, Car, Paperclip, FileText, UserRound } from 'lucide-react'
 import Link from 'next/link'
 
 interface Attachment {
@@ -25,6 +25,7 @@ interface QuoteRequest {
   rejectionReason?: string | null
   createdAt: string
   attachments: Attachment[]
+  handledBy?: { firstName: string; lastName: string } | null
 }
 
 const STATUS_CONFIG = {
@@ -115,6 +116,13 @@ export default function ClientRequestsPage() {
                       )}
 
                       <p className="text-sm text-gray-600 line-clamp-2">{req.description}</p>
+
+                      {req.handledBy && (
+                        <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-500">
+                          <UserRound className="w-3.5 h-3.5" />
+                          Traité par {req.handledBy.firstName} {req.handledBy.lastName}
+                        </div>
+                      )}
 
                       {/* Rejection reason */}
                       {req.status === 'REJECTED' && req.rejectionReason && (

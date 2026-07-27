@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, User as UserType } from '@/hooks/useUsers'
+import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, useManagerStats, User as UserType } from '@/hooks/useUsers'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useAuthStore } from '@/stores/auth.store'
 import { formatDate } from '@/lib/utils'
@@ -168,6 +168,7 @@ function UserModal({
 export default function UsersPage() {
   const { user: currentUser } = useAuthStore()
   const { data: users, isLoading } = useUsers()
+  const { data: stats } = useManagerStats()
   const deleteUser = useDeleteUser()
 
   const [modal, setModal] = useState<UserType | 'new' | null>(null)
@@ -215,6 +216,7 @@ export default function UsersPage() {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nom</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rôle</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Activité</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Créé le</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -245,6 +247,20 @@ export default function UsersPage() {
                       {u.role === 'ADMIN' ? <Shield className="w-3 h-3" /> : <User className="w-3 h-3" />}
                       {u.role === 'ADMIN' ? 'Admin' : 'Manager'}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {(() => {
+                      const s = stats?.find((x) => x.id === u.id)
+                      if (!s || (s.requestsHandled === 0 && s.quotesCreated === 0)) {
+                        return <span className="text-gray-300 text-xs">—</span>
+                      }
+                      return (
+                        <div className="text-xs text-gray-600 space-y-0.5">
+                          <p>{s.requestsHandled} demande{s.requestsHandled > 1 ? 's' : ''} traitée{s.requestsHandled > 1 ? 's' : ''}</p>
+                          <p className="text-gray-400">{s.quotesCreated} devis créé{s.quotesCreated > 1 ? 's' : ''} · {s.quotesAccepted} accepté{s.quotesAccepted > 1 ? 's' : ''}</p>
+                        </div>
+                      )
+                    })()}
                   </td>
                   <td className="px-4 py-3 text-gray-500">{formatDate(u.createdAt)}</td>
                   <td className="px-4 py-3">
