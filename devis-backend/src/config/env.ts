@@ -10,6 +10,10 @@ const envSchema = z.object({
   FIREBASE_PRIVATE_KEY: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().email().optional().or(z.literal('')),
   RESEND_API_KEY: z.string().optional(),
+  // Verified sender address. Falls back to Resend's shared test domain
+  // (works with no setup, but only 'from' side — not fully deliverable-branded)
+  // until a real domain is verified at https://resend.com/domains.
+  RESEND_FROM_EMAIL: z.string().email().default('onboarding@resend.dev'),
   FRONTEND_URL: z.string().url().default('http://localhost:3000'),
   PORT: z.string().default('4000'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),

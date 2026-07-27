@@ -140,7 +140,7 @@ export async function sendQuoteToClient(params: SendQuoteParams): Promise<void> 
   try {
     const client = getResend()
     const { error } = await client.emails.send({
-      from: `${companyName} <noreply@${getDomain()}>`,
+      from: `${companyName} <${env.RESEND_FROM_EMAIL}>`,
       to: clientEmail,
       subject: tr.sendSubject(quoteNumber),
       html: wrapEmail(content, companyName),
@@ -184,7 +184,7 @@ export async function sendSignatureConfirmation(params: SendSignatureConfirmatio
   try {
     const client = getResend()
     const { error } = await client.emails.send({
-      from: `${companyName} <noreply@${getDomain()}>`,
+      from: `${companyName} <${env.RESEND_FROM_EMAIL}>`,
       to: clientEmail,
       subject,
       html: wrapEmail(content, companyName),
@@ -228,7 +228,7 @@ export async function sendRequestRejection(params: {
   try {
     const client = getResend()
     const { error } = await client.emails.send({
-      from: `${companyName} <noreply@${getDomain()}>`,
+      from: `${companyName} <${env.RESEND_FROM_EMAIL}>`,
       to: clientEmail,
       subject: `Votre demande de devis — ${requestTitle}`,
       html: wrapEmail(content, companyName),
@@ -275,7 +275,7 @@ export async function sendRequestStatusUpdate(params: {
   try {
     const client = getResend()
     const { error } = await client.emails.send({
-      from: `${companyName} <noreply@${getDomain()}>`,
+      from: `${companyName} <${env.RESEND_FROM_EMAIL}>`,
       to: clientEmail,
       subject: `Mise à jour de votre demande — ${requestTitle}`,
       html: wrapEmail(content, companyName),
@@ -310,7 +310,7 @@ export async function sendUserInvitation(params: {
   try {
     const client = getResend()
     const { error } = await client.emails.send({
-      from: `${companyName} <noreply@${getDomain()}>`,
+      from: `${companyName} <${env.RESEND_FROM_EMAIL}>`,
       to: email,
       subject: `Activez votre compte ${companyName}`,
       html: wrapEmail(content, companyName),
@@ -322,12 +322,3 @@ export async function sendUserInvitation(params: {
   }
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function getDomain(): string {
-  try {
-    return new URL(env.FRONTEND_URL).hostname
-  } catch {
-    return 'monentreprise.com'
-  }
-}
