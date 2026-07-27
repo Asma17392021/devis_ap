@@ -23,7 +23,9 @@ const REFRESH_COOKIE = 'refresh_token'
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
+  // 'none' is required cross-site (frontend on vercel.app, API on onrender.com);
+  // it must be paired with secure:true, which production already sets.
+  sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'strict') as const,
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   path: '/',
 }
