@@ -139,7 +139,7 @@ export async function sendQuoteToClient(params: SendQuoteParams): Promise<void> 
 
   try {
     const client = getResend()
-    await client.emails.send({
+    const { error } = await client.emails.send({
       from: `${companyName} <noreply@${getDomain()}>`,
       to: clientEmail,
       subject: tr.sendSubject(quoteNumber),
@@ -151,6 +151,7 @@ export async function sendQuoteToClient(params: SendQuoteParams): Promise<void> 
         },
       ],
     })
+    if (error) throw error
     console.log(`📧 Email envoyé à ${clientEmail} (devis ${quoteNumber})`)
   } catch (err) {
     console.error(`⚠️ Email envoi échoué pour ${clientEmail}:`, err)
@@ -182,12 +183,13 @@ export async function sendSignatureConfirmation(params: SendSignatureConfirmatio
 
   try {
     const client = getResend()
-    await client.emails.send({
+    const { error } = await client.emails.send({
       from: `${companyName} <noreply@${getDomain()}>`,
       to: clientEmail,
       subject,
       html: wrapEmail(content, companyName),
     })
+    if (error) throw error
     console.log(`📧 Confirmation ${decision} envoyée à ${clientEmail}`)
   } catch (err) {
     console.error(`⚠️ Email confirmation échoué pour ${clientEmail}:`, err)
@@ -225,12 +227,13 @@ export async function sendRequestRejection(params: {
 
   try {
     const client = getResend()
-    await client.emails.send({
+    const { error } = await client.emails.send({
       from: `${companyName} <noreply@${getDomain()}>`,
       to: clientEmail,
       subject: `Votre demande de devis — ${requestTitle}`,
       html: wrapEmail(content, companyName),
     })
+    if (error) throw error
     console.log(`📧 Email refus demande envoyé à ${clientEmail}`)
   } catch (err) {
     console.error(`⚠️ Email refus demande échoué pour ${clientEmail}:`, err)
@@ -271,12 +274,13 @@ export async function sendRequestStatusUpdate(params: {
 
   try {
     const client = getResend()
-    await client.emails.send({
+    const { error } = await client.emails.send({
       from: `${companyName} <noreply@${getDomain()}>`,
       to: clientEmail,
       subject: `Mise à jour de votre demande — ${requestTitle}`,
       html: wrapEmail(content, companyName),
     })
+    if (error) throw error
     console.log(`📧 Email mise à jour demande envoyé à ${clientEmail}`)
   } catch (err) {
     console.error(`⚠️ Email mise à jour demande échoué:`, err)
@@ -305,12 +309,13 @@ export async function sendUserInvitation(params: {
 
   try {
     const client = getResend()
-    await client.emails.send({
+    const { error } = await client.emails.send({
       from: `${companyName} <noreply@${getDomain()}>`,
       to: email,
       subject: `Activez votre compte ${companyName}`,
       html: wrapEmail(content, companyName),
     })
+    if (error) throw error
     console.log(`📧 Email d'invitation envoyé à ${email}`)
   } catch (err) {
     console.error(`⚠️ Email d'invitation échoué pour ${email}:`, err)
