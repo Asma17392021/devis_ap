@@ -1,6 +1,8 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
+// Empty by default: same-origin, proxied to the backend via next.config.mjs rewrites.
+// Set NEXT_PUBLIC_API_URL locally (.env.local) to hit a backend directly instead.
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 
 export const clientApi = axios.create({
   baseURL: `${API_URL}/api`,

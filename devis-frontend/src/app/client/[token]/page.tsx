@@ -60,7 +60,7 @@ function formatDate(d: string) {
 }
 
 const portalApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL + '/api',
+  baseURL: (process.env.NEXT_PUBLIC_API_URL ?? '') + '/api',
 })
 
 // ─── Confirm modal ────────────────────────────────────────────────────────────
@@ -273,7 +273,7 @@ export default function ClientPortalPage({ params }: { params: { token: string }
             </div>
             {quote.pdfUrl && (
               <a
-                href={`${process.env.NEXT_PUBLIC_API_URL}/api/quotes/${quote.id}/pdf`}
+                href={`${process.env.NEXT_PUBLIC_API_URL ?? ''}/api/quotes/${quote.id}/pdf`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition shrink-0"
