@@ -25,7 +25,7 @@ const COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === 'production',
   // 'none' is required cross-site (frontend on vercel.app, API on onrender.com);
   // it must be paired with secure:true, which production already sets.
-  sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'strict') as const,
+  sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'strict') as 'none' | 'strict',
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   path: '/',
 }
