@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { z } from 'zod'
 import { prisma } from '../config/prisma'
-import { comparePassword } from '../utils/password'
+import { comparePassword, hashPassword } from '../utils/password'
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -17,6 +17,11 @@ import {
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
   password: z.string().min(1, 'Mot de passe requis'),
+})
+
+const activateSchema = z.object({
+  token: z.string().min(1, 'Lien invalide'),
+  password: z.string().min(8, 'Mot de passe : 8 caractères minimum'),
 })
 
 const REFRESH_COOKIE = 'refresh_token'
@@ -40,7 +45,7 @@ export async function login(req: Request, res: Response) {
   const { email, password } = result.data
 
   const user = await prisma.user.findUnique({ where: { email } })
-  if (!user) {
+  if (!user || !user.passwordHash) {
     return unauthorized(res, 'Email ou mot de passe incorrect')
   }
 
@@ -64,6 +69,46 @@ export async function login(req: Request, res: Response) {
       firstName: user.firstName,
       lastName: user.lastName,
       preferredLang: user.preferredLang,
+    },
+  })
+}
+
+// POST /api/auth/activate — sets the password for an invited (ADMIN/MANAGER) account
+export async function activate(req: Request, res: Response) {
+  const result = activateSchema.safeParse(req.body)
+  if (!result.success) {
+    return badRequest(res, 'Données invalides', result.error.flatten().fieldErrors)
+  }
+
+  const { token, password } = result.data
+
+  const user = await prisma.user.findUnique({ where: { activationToken: token } })
+  if (!user || !user.activationTokenExpiresAt || user.activationTokenExpiresAt < new Date()) {
+    return badRequest(res, 'Ce lien d\'activation est invalide ou expiré')
+  }
+
+  const passwordHash = await hashPassword(password)
+
+  const updated = await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash, activationToken: null, activationTokenExpiresAt: null },
+  })
+
+  const payload = { userId: updated.id, email: updated.email, role: updated.role }
+  const accessToken = generateAccessToken(payload)
+  const refreshToken = generateRefreshToken(payload)
+
+  res.cookie(REFRESH_COOKIE, refreshToken, COOKIE_OPTIONS)
+
+  return success(res, {
+    accessToken,
+    user: {
+      id: updated.id,
+      email: updated.email,
+      role: updated.role,
+      firstName: updated.firstName,
+      lastName: updated.lastName,
+      preferredLang: updated.preferredLang,
     },
   })
 }

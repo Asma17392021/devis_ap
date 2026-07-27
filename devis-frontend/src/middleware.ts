@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 // ─── Admin routes ─────────────────────────────────────────────────────────────
-const ADMIN_PUBLIC = ['/login']
+const ADMIN_PUBLIC = ['/login', '/activate']
 const ADMIN_PROTECTED = ['/', '/quotes', '/clients', '/users', '/settings', '/notifications', '/requests']
 
 // ─── Client portal routes ─────────────────────────────────────────────────────

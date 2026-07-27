@@ -13,12 +13,12 @@ import { formatDate } from '@/lib/utils'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
-// Single schema — password optional (required only when creating)
+// Password is never set here — new users get an email invitation to activate
+// their own account and choose their password.
 const userFormSchema = z.object({
   firstName: z.string().min(1, 'Prénom requis'),
   lastName: z.string().min(1, 'Nom requis'),
   email: z.string().email('Email invalide'),
-  password: z.string().optional(),
   role: z.enum(['ADMIN', 'MANAGER']),
   phone: z.string().optional().nullable(),
 })
@@ -38,13 +38,8 @@ function UserModal({
   const createUser = useCreateUser()
   const updateUser = useUpdateUser(user?.id ?? '')
 
-  // Refine schema at runtime: password required only for new users
-  const schema = isEdit
-    ? userFormSchema
-    : userFormSchema.extend({ password: z.string().min(8, '8 caractères minimum') })
-
   const { register, handleSubmit, formState: { errors } } = useForm<UserFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(userFormSchema),
     defaultValues: user
       ? { firstName: user.firstName, lastName: user.lastName, email: user.email, role: user.role, phone: user.phone }
       : { role: 'MANAGER' },
@@ -57,7 +52,7 @@ function UserModal({
         toast.success('Utilisateur mis à jour')
       } else {
         await createUser.mutateAsync(data)
-        toast.success('Utilisateur créé. Partagez les identifiants.')
+        toast.success(`Invitation envoyée à ${data.email}`)
       }
       onClose()
     } catch {
@@ -111,17 +106,9 @@ function UserModal({
           </div>
 
           {!isEdit && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe *</label>
-              <input
-                {...register('password')}
-                type="password"
-                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.password && (
-                <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
-              )}
-            </div>
+            <p className="text-xs text-gray-500 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
+              Un email d'activation sera envoyé à cette adresse pour que la personne choisisse elle-même son mot de passe.
+            </p>
           )}
 
           <div>

@@ -283,6 +283,40 @@ export async function sendRequestStatusUpdate(params: {
   }
 }
 
+/**
+ * Invite a newly created team member (ADMIN/MANAGER) to activate their account.
+ */
+export async function sendUserInvitation(params: {
+  email: string
+  firstName: string
+  activationUrl: string
+  companyName: string
+}): Promise<void> {
+  const { email, firstName, activationUrl, companyName } = params
+
+  const content = `
+    <p>Bonjour ${firstName},</p>
+    <p>Un compte vient d'être créé pour vous sur <strong>${companyName}</strong>.</p>
+    <p>Cliquez sur le bouton ci-dessous pour choisir votre mot de passe et activer votre compte :</p>
+    <a href="${activationUrl}" class="cta">Activer mon compte</a>
+    <p style="color:#6b7280;font-size:13px;">Ce lien expire dans 7 jours.</p>
+    <p>Cordialement,<br/><strong>${companyName}</strong></p>
+  `
+
+  try {
+    const client = getResend()
+    await client.emails.send({
+      from: `${companyName} <noreply@${getDomain()}>`,
+      to: email,
+      subject: `Activez votre compte ${companyName}`,
+      html: wrapEmail(content, companyName),
+    })
+    console.log(`📧 Email d'invitation envoyé à ${email}`)
+  } catch (err) {
+    console.error(`⚠️ Email d'invitation échoué pour ${email}:`, err)
+  }
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getDomain(): string {

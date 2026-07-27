@@ -1,12 +1,16 @@
 import { Request, Response } from 'express'
+import { randomBytes } from 'crypto'
 import { z } from 'zod'
 import { prisma } from '../config/prisma'
 import { hashPassword } from '../utils/password'
+import { sendUserInvitation } from '../services/email.service'
+import { env } from '../config/env'
 import { success, created, noContent, badRequest, notFound, conflict, forbidden } from '../utils/response'
+
+const ACTIVATION_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 
 const createUserSchema = z.object({
   email: z.string().email('Email invalide'),
-  password: z.string().min(8, 'Mot de passe : 8 caractères minimum'),
   firstName: z.string().min(1, 'Prénom requis'),
   lastName: z.string().min(1, 'Nom requis'),
   phone: z.string().optional(),
@@ -47,25 +51,34 @@ export async function listUsers(_req: Request, res: Response) {
 }
 
 // POST /api/users — ADMIN only
+// Creates the account without a password and emails an activation link —
+// the invitee sets their own password from there.
 export async function createUser(req: Request, res: Response) {
   const result = createUserSchema.safeParse(req.body)
   if (!result.success) {
     return badRequest(res, 'Données invalides', result.error.flatten().fieldErrors)
   }
 
-  const { email, password, firstName, lastName, phone, role, preferredLang } = result.data
+  const { email, firstName, lastName, phone, role, preferredLang } = result.data
 
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {
     return conflict(res, 'Un utilisateur avec cet email existe déjà')
   }
 
-  const passwordHash = await hashPassword(password)
+  const activationToken = randomBytes(32).toString('hex')
+  const activationTokenExpiresAt = new Date(Date.now() + ACTIVATION_TOKEN_TTL_MS)
 
   const user = await prisma.user.create({
-    data: { email, passwordHash, firstName, lastName, phone, role, preferredLang },
+    data: {
+      email, firstName, lastName, phone, role, preferredLang,
+      activationToken, activationTokenExpiresAt,
+    },
     select: USER_SELECT,
   })
+
+  const activationUrl = `${env.FRONTEND_URL}/activate?token=${activationToken}`
+  sendUserInvitation({ email, firstName, activationUrl, companyName: 'Devis Pro' })
 
   return created(res, user)
 }

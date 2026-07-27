@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { login, refresh, logout, me, updateMe, updateFcmToken } from '../controllers/auth.controller'
+import { login, activate, refresh, logout, me, updateMe, updateFcmToken } from '../controllers/auth.controller'
 import { authenticate } from '../middleware/auth.middleware'
 
 const router = Router()
@@ -30,6 +30,32 @@ const router = Router()
  *         description: Identifiants incorrects
  */
 router.post('/login', login)
+
+/**
+ * @swagger
+ * /auth/activate:
+ *   post:
+ *     summary: Active un compte invité (définit le mot de passe) et connecte l'utilisateur
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token, password]
+ *             properties:
+ *               token:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Compte activé, retourne access_token
+ *       400:
+ *         description: Lien invalide ou expiré
+ */
+router.post('/activate', activate)
 
 /**
  * @swagger

@@ -48,13 +48,17 @@ enum QuoteRequestStatus {
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
-  passwordHash String
+  passwordHash String?  // Null until the invited user activates their account
   role         Role     @default(MANAGER)
   firstName    String
   lastName     String
   phone        String?
   fcmToken     String?  // Firebase Cloud Messaging token (mobile)
   preferredLang String  @default("fr")
+
+  activationToken          String?   @unique
+  activationTokenExpiresAt DateTime?
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
