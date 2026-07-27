@@ -389,8 +389,8 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
         </div>
       </div>
 
-      {/* Portal link — shown when SENT/ACCEPTED/REFUSED */}
-      {(isSent || quote.status === 'ACCEPTED' || quote.status === 'REFUSED') && quote.signatureToken && (
+      {/* Portal link — only useful while awaiting the client's decision */}
+      {isSent && quote.signatureToken && (
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
             Lien portail client
