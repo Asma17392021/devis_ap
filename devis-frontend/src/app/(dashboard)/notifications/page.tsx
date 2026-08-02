@@ -9,6 +9,7 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
   QUOTE_ACCEPTED: { label: 'Devis accepté', color: 'text-green-600 bg-green-50' },
   QUOTE_REFUSED: { label: 'Devis refusé', color: 'text-red-600 bg-red-50' },
   QUOTE_EXPIRING: { label: 'Devis expirant', color: 'text-orange-600 bg-orange-50' },
+  QUOTE_REQUEST_RECEIVED: { label: 'Nouvelle demande', color: 'text-blue-600 bg-blue-50' },
 }
 
 export default function NotificationsPage() {
@@ -74,6 +75,14 @@ export default function NotificationsPage() {
                         className="text-xs text-blue-600 hover:underline mt-0.5 inline-block"
                       >
                         {n.quote.number} — {n.quote.title}
+                      </Link>
+                    )}
+                    {n.request && (
+                      <Link
+                        href="/requests"
+                        className="text-xs text-blue-600 hover:underline mt-0.5 inline-block"
+                      >
+                        {n.request.title}
                       </Link>
                     )}
                     <p className="text-xs text-gray-400 mt-1">{formatDate(n.createdAt)}</p>

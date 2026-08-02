@@ -170,7 +170,7 @@ export function Header() {
                 {notifications.slice(0, 10).map((n) => (
                   <button
                     key={n.id}
-                    onClick={() => { router.push(`/quotes/${n.quoteId}`); setShowNotifs(false) }}
+                    onClick={() => { router.push(n.quoteId ? `/quotes/${n.quoteId}` : '/requests'); setShowNotifs(false) }}
                     className={`w-full flex gap-3 px-4 py-3 hover:bg-gray-50 transition text-left border-b border-gray-50 ${!n.readAt ? 'bg-blue-50/50' : ''}`}
                   >
                     <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${!n.readAt ? 'bg-blue-500' : 'bg-gray-200'}`} />

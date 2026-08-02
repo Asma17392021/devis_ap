@@ -31,7 +31,8 @@ const FCM_MESSAGES: Record<NotificationType, { title: string; body: (quoteNumber
 
 export interface NotifyManagersPayload {
   type: NotificationType
-  quoteId: string
+  quoteId?: string
+  requestId?: string
   quoteNumber: string
   clientName: string
 }
@@ -44,7 +45,7 @@ export interface NotifyManagersPayload {
  * Gracefully degrades if Firebase is not configured.
  */
 export async function sendNotificationToManagers(payload: NotifyManagersPayload): Promise<void> {
-  const { type, quoteId, quoteNumber, clientName } = payload
+  const { type, quoteId, requestId, quoteNumber, clientName } = payload
 
   // Fetch all managers/admins with a valid FCM token
   const users = await prisma.user.findMany({
@@ -70,7 +71,8 @@ export async function sendNotificationToManagers(payload: NotifyManagersPayload)
       tokens,
       notification: { title, body: bodyText },
       data: {
-        quoteId,
+        ...(quoteId ? { quoteId } : {}),
+        ...(requestId ? { requestId } : {}),
         type,
         quoteNumber,
         clientName,

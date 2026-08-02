@@ -171,8 +171,14 @@ model Notification {
 
   userId  String
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quoteId String
-  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  // Exactly one of quoteId/requestId is set, depending on `type`
+  // (QUOTE_REQUEST_RECEIVED points to a request, everything else to a quote).
+  quoteId String?
+  quote   Quote?  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  requestId String?
+  request   QuoteRequest? @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
@@ -220,7 +226,8 @@ model QuoteRequest {
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
 
-  attachments QuoteRequestAttachment[]
+  attachments   QuoteRequestAttachment[]
+  notifications Notification[]
 
   @@map("quote_requests")
 }

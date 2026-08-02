@@ -10,6 +10,9 @@ export async function listNotifications(req: Request, res: Response) {
       quote: {
         select: { id: true, number: true, title: true, status: true },
       },
+      request: {
+        select: { id: true, title: true, status: true },
+      },
     },
     orderBy: [
       { readAt: 'asc' },    // unread first (null sorts before dates)

@@ -9,8 +9,10 @@ interface Notification {
   message: string
   readAt: string | null
   createdAt: string
-  quoteId: string
-  quote: { id: string; number: string; title: string; status: string }
+  quoteId: string | null
+  quote: { id: string; number: string; title: string; status: string } | null
+  requestId: string | null
+  request: { id: string; title: string; status: string } | null
 }
 
 interface NotificationsResponse {

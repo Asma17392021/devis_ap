@@ -2,6 +2,8 @@ import { Request, Response } from 'express'
 import { z } from 'zod'
 import { prisma } from '../config/prisma'
 import { uploadFile, deleteFile, extractPathFromUrl } from '../services/storage.service'
+import { notifyManagers } from '../services/notification.service'
+import { sendNewRequestAlert } from '../services/email.service'
 import { success, created, noContent, badRequest, notFound, forbidden, serverError } from '../utils/response'
 
 const ALLOWED_MIME_TYPES = [
@@ -102,7 +104,33 @@ export async function createRequest(req: Request, res: Response) {
 
   const quoteRequest = await prisma.quoteRequest.create({
     data: { ...result.data, clientId },
+    include: { client: true },
   })
+
+  // Alert ADMIN/MANAGER staff (in-app + push + email), non-fatal.
+  try {
+    await notifyManagers({
+      type: 'QUOTE_REQUEST_RECEIVED',
+      requestId: quoteRequest.id,
+      quoteNumber: '',
+      clientName: quoteRequest.client.name,
+    })
+
+    const [managers, company] = await Promise.all([
+      prisma.user.findMany({ where: { role: { in: ['ADMIN', 'MANAGER'] } }, select: { email: true } }),
+      prisma.companySettings.findUnique({ where: { id: 'singleton' } }),
+    ])
+
+    await sendNewRequestAlert({
+      managerEmails: managers.map((m) => m.email),
+      clientName: quoteRequest.client.name,
+      requestTitle: quoteRequest.title,
+      companyName: company?.name ?? 'Mon Entreprise',
+      appUrl: process.env.FRONTEND_URL ?? 'http://localhost:3000',
+    })
+  } catch (err) {
+    console.error('⚠️ Notification nouvelle demande échouée:', err)
+  }
 
   return created(res, quoteRequest)
 }

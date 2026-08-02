@@ -288,6 +288,42 @@ export async function sendRequestStatusUpdate(params: {
 }
 
 /**
+ * Notify ADMIN/MANAGER staff that a client submitted a new quote request.
+ */
+export async function sendNewRequestAlert(params: {
+  managerEmails: string[]
+  clientName: string
+  requestTitle: string
+  companyName: string
+  appUrl: string
+}): Promise<void> {
+  const { managerEmails, clientName, requestTitle, companyName, appUrl } = params
+  if (managerEmails.length === 0) return
+
+  const content = `
+    <p>Bonjour,</p>
+    <p><strong>${clientName}</strong> a soumis une nouvelle demande de devis :</p>
+    <p><strong>${requestTitle}</strong></p>
+    <a href="${appUrl}/requests" class="cta">Voir la demande</a>
+    <p>Cordialement,<br/><strong>${companyName}</strong></p>
+  `
+
+  try {
+    const client = getResend()
+    const { error } = await client.emails.send({
+      from: `${companyName} <${env.RESEND_FROM_EMAIL}>`,
+      to: managerEmails,
+      subject: `Nouvelle demande de devis — ${clientName}`,
+      html: wrapEmail(content, companyName),
+    })
+    if (error) throw error
+    console.log(`📧 Alerte nouvelle demande envoyée à ${managerEmails.length} destinataire(s)`)
+  } catch (err) {
+    console.error(`⚠️ Alerte nouvelle demande échouée:`, err)
+  }
+}
+
+/**
  * Invite a newly created team member (ADMIN/MANAGER) to activate their account.
  */
 export async function sendUserInvitation(params: {
