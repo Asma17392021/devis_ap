@@ -8,7 +8,11 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
-export function InstallAppButton() {
+interface InstallAppButtonProps {
+  variant?: 'pill' | 'block'
+}
+
+export function InstallAppButton({ variant = 'pill' }: InstallAppButtonProps) {
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null)
   const [installed, setInstalled] = useState(false)
 
@@ -44,8 +48,21 @@ export function InstallAppButton() {
     setInstallEvent(null)
   }
 
+  if (variant === 'block') {
+    return (
+      <button
+        onClick={handleInstall}
+        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-lg transition"
+      >
+        <Download className="w-4 h-4" />
+        Installer l&apos;application
+      </button>
+    )
+  }
+
   return (
     <button
+      type="button"
       onClick={handleInstall}
       className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
     >
