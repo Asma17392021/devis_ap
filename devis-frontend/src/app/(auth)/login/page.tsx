@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 import { Loader2, FileText, Lock, Mail } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
+import { InstallAppButton } from '@/components/layout/InstallAppButton'
 
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -101,6 +102,8 @@ export default function LoginPage() {
               <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
             )}
           </div>
+
+          <InstallAppButton variant="block" />
 
           {/* Submit */}
           <button
