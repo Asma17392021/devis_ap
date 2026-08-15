@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { Loader2, FileText, Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useClientAuthStore } from '@/stores/client-auth.store'
+import { InstallAppButton } from '@/components/layout/InstallAppButton'
 
 const schema = z.object({
   email: z.string().email('Email invalide'),
@@ -41,6 +42,9 @@ export default function ClientLoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="fixed top-4 right-4">
+        <InstallAppButton />
+      </div>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-600 rounded-2xl mb-4 shadow-lg">

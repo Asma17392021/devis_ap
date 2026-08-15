@@ -8,13 +8,13 @@ import '@/globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Devis Pro — Gestion de devis',
+  title: 'Autoclick Devis — Gestion de devis',
   description: 'Plateforme professionnelle de gestion des devis',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Devis Pro',
+    title: 'Autoclick Devis',
   },
 }
 

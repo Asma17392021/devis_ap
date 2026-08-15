@@ -78,7 +78,7 @@ export async function createUser(req: Request, res: Response) {
   })
 
   const activationUrl = `${env.FRONTEND_URL}/activate?token=${activationToken}`
-  sendUserInvitation({ email, firstName, activationUrl, companyName: 'Devis Pro' })
+  sendUserInvitation({ email, firstName, activationUrl, companyName: 'Autoclick Devis' })
 
   return created(res, user)
 }

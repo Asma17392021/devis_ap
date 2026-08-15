@@ -69,7 +69,7 @@ export function Sidebar() {
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <FileText className="w-4 h-4 text-white" />
           </div>
-          <span className="font-bold text-gray-900 text-lg">Devis Pro</span>
+          <span className="font-bold text-gray-900 text-lg">Autoclick Devis</span>
         </div>
       </div>
 

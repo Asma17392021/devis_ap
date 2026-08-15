@@ -96,7 +96,7 @@ export async function updateRequestStatus(req: Request, res: Response) {
   const clientName = request.client.name
   const accountId = request.client.account?.id
   const portalUrl = `${env.FRONTEND_URL}/client/requests`
-  const companyName = 'Devis Pro'
+  const companyName = 'Autoclick Devis'
   const handledByName = request.handledBy
     ? `${request.handledBy.firstName} ${request.handledBy.lastName}`
     : undefined
