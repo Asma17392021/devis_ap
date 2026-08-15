@@ -103,8 +103,6 @@ export default function LoginPage() {
             )}
           </div>
 
-          <InstallAppButton variant="block" />
-
           {/* Submit */}
           <button
             type="submit"
@@ -114,6 +112,8 @@ export default function LoginPage() {
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoading ? 'Connexion...' : 'Se connecter'}
           </button>
+
+          <InstallAppButton variant="block" />
         </form>
       </div>
 

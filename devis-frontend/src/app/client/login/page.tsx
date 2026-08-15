@@ -90,8 +90,6 @@ export default function ClientLoginPage() {
               {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
             </div>
 
-            <InstallAppButton variant="block" />
-
             <button
               type="submit"
               disabled={isLoading}
@@ -100,6 +98,8 @@ export default function ClientLoginPage() {
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {isLoading ? 'Connexion...' : 'Se connecter'}
             </button>
+
+            <InstallAppButton variant="block" />
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
