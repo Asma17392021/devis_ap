@@ -7,6 +7,7 @@ import { useNotifications } from '@/hooks/useNotifications'
 import { useAuthStore } from '@/stores/auth.store'
 import { api } from '@/lib/api'
 import { formatDate } from '@/lib/utils'
+import { InstallAppButton } from './InstallAppButton'
 
 type SearchResult = { id: string; number: string; title: string; status: string; client: { name: string } }
 
@@ -120,6 +121,9 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-2 ml-auto">
+        {/* Install app (only shown when the browser can install the PWA) */}
+        <InstallAppButton />
+
         {/* Language switcher */}
         <div className="relative group">
           <button className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition">

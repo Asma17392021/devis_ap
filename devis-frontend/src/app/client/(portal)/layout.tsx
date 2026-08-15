@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useClientAuthStore } from '@/stores/client-auth.store'
 import { clientApi } from '@/lib/client-api'
+import { InstallAppButton } from '@/components/layout/InstallAppButton'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -189,6 +190,7 @@ export default function ClientPortalLayout({ children }: { children: React.React
           </div>
 
           <div className="flex items-center gap-2">
+            <InstallAppButton />
             <NotificationsDropdown />
             <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 px-2">
               <User className="w-4 h-4" />
