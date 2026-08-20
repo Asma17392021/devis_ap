@@ -19,8 +19,8 @@
     "path": "C:\\Users\\asmas\\Downloads\\devis_ap\\android-twa\\android.keystore",
     "alias": "android"
   },
-  "appVersionName": "1",
-  "appVersionCode": 1,
+  "appVersionName": "2",
+  "appVersionCode": 2,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://devis-ap.vercel.app/manifest.json",
