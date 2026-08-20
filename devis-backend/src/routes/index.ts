@@ -11,6 +11,7 @@ import { settingsRouter } from './settings.routes'
 import { clientAuthRouter } from './client-auth.routes'
 import { clientPortalRouter } from './client-portal.routes'
 import { requestsRouter } from './requests.routes'
+import { companyInfoRouter } from './company-info.routes'
 import { setupSwagger } from '../config/swagger'
 
 const router = Router()
@@ -28,6 +29,7 @@ router.use('/dashboard', dashboardRouter)
 router.use('/notifications', notificationsRouter)
 router.use('/settings', settingsRouter)
 router.use('/requests', requestsRouter)  // Admin — client quote requests
+router.use('/company-info', companyInfoRouter) // Public — used by the privacy policy page
 
 // Swagger docs
 setupSwagger(router)
