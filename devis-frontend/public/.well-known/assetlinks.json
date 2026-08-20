@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.autoclickdevis.app",
+      "sha256_cert_fingerprints": [
+        "F2:15:63:89:45:1A:AD:75:A9:D0:00:23:A6:AE:63:22:82:6C:4C:A9:D0:65:27:4A:B7:1D:76:C6:19:41:CA:A4"
+      ]
+    }
+  }
+]
